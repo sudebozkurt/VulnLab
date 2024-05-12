@@ -1,6 +1,6 @@
 <!-- PROJECT LOGO -->
 <p align="center">
-  <a href="https://siberyavuzlar.com">
+  <a href="https://yavuzlar.org">
     <img src="https://i.ibb.co/nDLHW7m/logomodern.png" alt="Logo" width="180" height="180">
   </a>
 
@@ -30,6 +30,9 @@
 * Broken Authentication
 * Race Condition
 * Server Side Template Injection (SSTI)
+* API Hacking
+* Captcha Bypass
+* Path Traversal
 
 <!-- Installation -->
 ## Installation
