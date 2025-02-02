@@ -1,12 +1,33 @@
 <?php
 require("../../../lang/lang.php");
 $strings = tr();
+
 session_start();
 
 if (!isset($_SESSION['username'])) {
     header('Location: index.php');
     exit;
 }
+
+if (!isset($_SESSION['id'])) {
+    $usersFilePath = __DIR__ . '/api/users.json';
+
+    if (!file_exists($usersFilePath)) {
+        die();
+    }
+
+    $users = json_decode(file_get_contents($usersFilePath), true);
+
+    $loggedInUser = $_SESSION['username'];
+
+    foreach ($users as $user) {
+        if ($user['username'] === $loggedInUser) {
+            $_SESSION['user_id'] = $user['id'];
+            break;
+        }
+    }
+}
+
 
 ?>
 
@@ -22,6 +43,10 @@ if (!isset($_SESSION['username'])) {
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="mb-4"><?php echo $strings['labtitle']; ?> </h1>
+
+        <button type="button" class="btn btn-secondary mt-2" onclick="resetImages()"><?php echo $strings['resetlab'] ?></button>
+        <button type="button" class="btn btn-danger mt-2" onclick="logout()"><?php echo $strings['logout']; ?></button>
+
 
         <!-- Image Upload Form -->
         <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
@@ -45,11 +70,11 @@ if (!isset($_SESSION['username'])) {
     <script>
         // Fetch and display uploaded images using API
         function fetchImages() {
-            fetch('api/get_images.php')
+        fetch('api/get_images.php')
             .then(response => response.json())
             .then(data => {
                 const imageList = document.getElementById('imageList');
-                imageList.innerHTML = ""; 
+                imageList.innerHTML = "";
 
                 data.forEach(image => {
                     const col = document.createElement('div');
@@ -63,15 +88,24 @@ if (!isset($_SESSION['username'])) {
                     imgElement.alt = '<?php echo $strings['uploaded']; ?>';
                     imgElement.className = 'card-img-top';
 
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body text-center';
+
+                    const fileName = document.createElement('h5');
+                    fileName.className = 'card-title';
+                    fileName.textContent = image;
+
                     const deleteButton = document.createElement('button');
-                    deleteButton.textContent = '<?php echo $strings['delete']; ?> ';
-                    deleteButton.className = 'btn btn-danger position-absolute top-50 start-50 translate-middle'; 
-                    deleteButton.onclick = function() {
+                    deleteButton.textContent = '<?php echo $strings['delete']; ?>';
+                    deleteButton.className = 'btn btn-danger position-absolute top-50 start-50 translate-middle';
+                    deleteButton.onclick = function () {
                         deleteImage(image);
                     };
 
+                    cardBody.appendChild(fileName);
                     card.appendChild(imgElement);
-                    card.appendChild(deleteButton); 
+                    card.appendChild(cardBody);
+                    card.appendChild(deleteButton);
                     col.appendChild(card);
                     imageList.appendChild(col);
                 });
@@ -121,9 +155,39 @@ if (!isset($_SESSION['username'])) {
             .catch(error => console.error('Error:', error));
         }
 
+        function resetImages() {
+            fetch('api/reset_images.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('<?php echo $strings['reset']; ?>');
+                        fetchImages();
+                    }
+                })
+                .catch(error => console.error('Hata:', error));
+        }
+
+        function logout() {
+        fetch('api/logout.php')
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'index.php'; 
+                } else {
+                    alert('<?php echo $strings['logouterr'] ?>');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+
         // Initial fetch to display uploaded images on page load
         fetchImages();
     </script>
-     <script id="VLBar" title="<?= $strings['title'] ?>" category-id="1" src="/public/assets/js/vlnav.min.js"></script>
+     <script id="VLBar" title="<?= $strings['title'] ?>" category-id="13" src="/public/assets/js/vlnav.min.js"></script>
 </body>
 </html>

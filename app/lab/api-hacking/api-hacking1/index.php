@@ -4,7 +4,7 @@ $strings = tr();
 session_start();
 
 // Read users json
-$usersData = file_get_contents('users.json');
+$usersData = file_get_contents('api/users.json');
 $users = json_decode($usersData, true);
 
 // Username and Password Check
@@ -30,7 +30,6 @@ if ($foundUser) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="<?= $strings['lang']; ?>">
 <head>
@@ -40,29 +39,31 @@ if ($foundUser) {
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#loginForm').submit(function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: 'POST',
-                    url: 'api.php',
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    data: JSON.stringify({ action: 'login', username: $('#username').val(), password: $('#password').val() }),
-                    success: function(response) {
-                        alert(response.error || response.message);
-                        if (response.success) {
-                            window.location.href = 'dashboard.php';
-                        }
-                    },
-                    error: function() {
-                        alert($strings['requesterr']);
+
+<script>
+    $(document).ready(function() {
+        $('#loginForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: 'api.php',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({ action: 'login', id: $('#username').val(), password: $('#password').val() }),
+                success: function(response) {
+                    alert(response.error || response.message);
+                    if (response.success) {
+                        window.location.href = 'dashboard.php';
                     }
-                });
+                },
+                error: function() {
+                    alert($strings['requesterr']);
+                }
             });
         });
-    </script>
+    });
+</script>
+
 </head>
 <body>
 
@@ -85,6 +86,7 @@ if ($foundUser) {
                     </div>
                     <div class="mb-3 text-center">
                         <button type="submit" class="btn btn-primary"><?php echo $strings['login']; ?></button>
+                        <a href="api/all_wallpapers.php" class="btn btn-secondary"><?php echo $strings['allwallpapers']; ?></a>
                     </div>
                     <div class="mb-3 text-center">
                         <h4><?php echo $strings['username']; ?> user</h4>
@@ -98,6 +100,6 @@ if ($foundUser) {
 
 <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script id="VLBar" title="<?= $strings['title'] ?>" category-id="1" src="/public/assets/js/vlnav.min.js"></script>
+<script id="VLBar" title="<?= $strings['title'] ?>" category-id="13" src="/public/assets/js/vlnav.min.js"></script>
 </body>
 </html>
